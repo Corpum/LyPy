@@ -3,7 +3,7 @@ import urllib
 import re
 import time
 import nltk
-from nltk.stem.lancaster import LancasterStemmer as ls
+
 class Lyrics:
     
     def __init__(self, songlink):
@@ -38,7 +38,7 @@ class Lyrics:
             string = nltk.pos_tag(string)
             for entries in string:
                 if 'NN' in entries[1]:
-                    self.keywords.append(ls.stem(entries[0]))
+                    self.keywords.append(entries[0])
             
 
         

@@ -3,7 +3,7 @@ import urllib
 import re
 import time
 import nltk
-
+from nltk.stem.lancaster import LancasterStemmer as ls
 class Lyrics:
     
     def __init__(self, songlink):
@@ -33,38 +33,12 @@ class Lyrics:
     def sortlyrics(self, lyrics):     
         """ Finds the last used nouns of each line"""
         self.keywords = []
-        self.accepted = ['n.', 'adj.']
-        self.blacklisted = [',', 'my', ]
-        # Queries words beginning from end of line. If adjective or noun is found, that line is finished.
         for lines in lyrics:
             string = nltk.word_tokenize(lines)
-            string.reverse()
-            for words in string:
-                if words not in self.blacklisted:
-                    pos = self.partofspeech(words)
-                    if pos in self.accepted:
-                        self.keywords.append(words)
-                        break
-                    else:
-                        self.blacklisted.append(words)
-        
-    def partofspeech(self, word):
-        """ Uses wordnik to find part of speech"""
-        # Open Wordnik
-        wordnik = 'https://www.wordnik.com/words/%s' % word
-        ulink = urllib.urlopen(wordnik).read()
-        soup = BeautifulSoup(ulink, 'lxml')
-        # Get the first defintion of wordnik, locates partofspeech
-        defs = soup.select('#define')[0]
-        defs = defs.text[:104]
-        try:
-            regex = "[a-z]+\."
-            pattern = re.search(regex, defs)
-            start = pattern.start()
-            end = pattern.end()
-            return defs[start:end]
-        
-        except AttributeError:
-            pass
-        
+            string = nltk.pos_tag(string)
+            for entries in string:
+                if 'NN' in entries[1]:
+                    self.keywords.append(ls.stem(entries[0]))
+            
+
         
